@@ -16,7 +16,10 @@ class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerC
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        call()
+           
+//        print(call()?.values)
         itemTable.register(UITableViewCell.self,
                                forCellReuseIdentifier: "TableViewCell")
         
@@ -35,34 +38,44 @@ class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerC
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
     }
+     
+     
     */
-    func call () {
+    
+
+    func call () -> NSArray? {
         
 //        let params = ["username":"john", "password":"123456"] as Dictionary<String, String>
-
-        var request = URLRequest(url: URL(string: "    https://mas-prog-asgn.herokuapp.com/posts")!)
-        request.httpMethod = "POST"
-        request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
+        var x:NSArray? = nil
+        let url = URL(string: "https://mas-prog-asgn.herokuapp.com/posts")
+        var request = URLRequest(url: url!)
+        request.httpMethod = "GET"
+//        request.httpBody = try? JSONSerialization.data(wit, options: [])
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let session = URLSession.shared
         let task = session.dataTask(with: request, completionHandler: { data, response, error -> Void in
-            print(response!)
+//            print(response!)
             do {
-                let json = try JSONSerialization.jsonObject(with: data!) as! Dictionary<String, AnyObject>
-                print(json)
+                x = (try JSONSerialization.jsonObject(with: data!)) as! NSArray
+//                let json = try JSONSerialization.jsonObject(with: data!) as! Dictionary<String, AnyObject>
+//                x = json
+                print(x?[1])
+                
             } catch {
                 print("error")
             }
+           
         })
 
         task.resume()
-
+        return x
 
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.tableViewData.count
+//        let x = call()
+        return 5
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
