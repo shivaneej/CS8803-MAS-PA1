@@ -8,40 +8,23 @@
 import UIKit
 
 class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
-    
 
     @IBOutlet weak var itemTable: UITableView!
-    let tableViewData = Array(repeating: "Item", count: 5)
-    
+    var tableViewData: NSArray? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        call()
-           
-//        print(call()?.values)
+        DispatchQueue.main.async {
+            self.tableViewData = self.call()
+            self.itemTable.reloadData()
+        }
+        
         itemTable.register(UITableViewCell.self,
                                forCellReuseIdentifier: "TableViewCell")
         
         itemTable.dataSource = self
-        
-        
-        // Do any additional setup after loading the view.
+        itemTable.reloadData()
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-     
-     
-    */
-    
 
     func call () -> NSArray? {
         
@@ -60,14 +43,24 @@ class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerC
                 x = (try JSONSerialization.jsonObject(with: data!)) as! NSArray
 //                let json = try JSONSerialization.jsonObject(with: data!) as! Dictionary<String, AnyObject>
 //                x = json
-                print(x?[1])
+                let jsonData = try! JSONSerialization.data(withJSONObject: x)
+//                let arrayString = String(data: jsonData, encoding: .utf8)!
+                let p = x as! NSArray
+//                print(p)
+                self.tableViewData = x
+                DispatchQueue.main.async {
+                    self.itemTable.reloadData()
+                }
                 
+
+//                print(p.value(forKey: "category"))
             } catch {
                 print("error")
             }
            
         })
-
+        itemTable.reloadData()
+        
         task.resume()
         return x
 
@@ -75,15 +68,32 @@ class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerC
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 //        let x = call()
-        return 5
+        return tableViewData?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell",
                                                      for: indexPath)
-            cell.textLabel?.text = self.tableViewData[indexPath.row]
+//            tableViewData = call()!
+        let x = tableViewData![indexPath.row] as! Dictionary<String, Any>
+        print(x)
+        
+       
+        cell.textLabel?.text = x["name"] as? String
+        
+        let url = URL(string: x["image_url"] as! String)
+        let data = try? Data(contentsOf: url!)
+
+        if let imageData = data {
+            let image = UIImage(data: imageData)
+            cell.imageView?.image =  image
+        }
+
             return cell
     }
+    
+    
+    
     
 
 }
