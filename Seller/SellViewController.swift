@@ -137,13 +137,11 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
                   let message = "Ad Posted!"
 //                  print(httpResponse.statusCode)
                   self.rep = httpResponse.statusCode
-                  /*
                   DispatchQueue.main.async {
                       if let navController = self.navigationController{
                           self.displayAlert(message: message, dismiss: true)
                       }
                   }
-                */
               } else {
                 print("data maybe corrupted or in wrong format")
                 throw URLError(.badServerResponse)
@@ -165,16 +163,6 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
             let duration: Double = 1 // auto dismiss after 1 sec
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration) {
                 alert.dismiss(animated: true)
-                /*
-                if let navcontroller = self.navigationController{
-                    navcontroller.popViewController(animated: false)
-                }
-                for each in self.navigationController.viewControllers {
-                    if let each = each as? buy {
-                    navigationController.popToViewController(each, animated: false)
-                    }
-                }
-                */
             }
         }
         
