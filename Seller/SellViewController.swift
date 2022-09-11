@@ -40,7 +40,7 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
         if sender.text == "" {
             return
         }
-        DispatchQueue.global().async {
+        DispatchQueue.main.async {
             let urlString = sender.text!
             let url = URL(string: urlString)!
             guard let data = try? Data(contentsOf: url) else {
@@ -72,7 +72,7 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
             displayAlert(message: "Please enter contact number")
             return
         }
-        
+//
         if (postImage.isEmpty) {
             displayAlert(message: "Please enter item image url")
             return
@@ -82,10 +82,10 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
             displayAlert(message: "Please enter item price")
             return
         }
-        DispatchQueue.main.async {
+//        DispatchQueue.main.async {
             self.createNewPost(title: postTitle, category: postCategory, description: postDesc, contact: postContact, imageURL: postImage, price: postPrice)
 
-        }
+//        }
         print(rep)
         print("here")
     }

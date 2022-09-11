@@ -228,7 +228,6 @@
                                         <buttonConfiguration key="configuration" style="filled" title="Post!"/>
                                         <connections>
                                             <action selector="postButtonClicked:" destination="4WF-r3-diw" eventType="touchUpInside" id="3Wb-2d-le2"/>
-                                            <segue destination="nyi-o0-Guc" kind="presentation" identifier="seg" modalPresentationStyle="overFullScreen" id="6Uo-4j-zpy"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -299,9 +298,6 @@
             <point key="canvasLocation" x="1176.8115942028987" y="771.42857142857144"/>
         </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="6Uo-4j-zpy"/>
-    </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="chevron.backward" catalog="system" width="96" height="128"/>
