@@ -7,13 +7,18 @@
 
 import UIKit
 
-class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
+class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerControllerDelegate, UITableViewDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var itemTable: UITableView!
     var tableViewData: NSArray? = nil
+    @IBAction func ref(_ sender: Any) {
+        viewDidLoad()
+//        itemTable.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        self.itemTable.reloadData()
         DispatchQueue.main.async {
             self.tableViewData = self.call()
             self.itemTable.reloadData()
@@ -22,7 +27,9 @@ class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerC
         itemTable.register(UITableViewCell.self,
                                forCellReuseIdentifier: "TableViewCell")
         
+        itemTable.allowsSelection = true
         itemTable.dataSource = self
+        itemTable.delegate = self
         itemTable.reloadData()
     }
 
@@ -76,22 +83,74 @@ class BuyViewController: UIViewController, UITableViewDataSource, UIImagePickerC
                                                      for: indexPath)
 //            tableViewData = call()!
         let x = tableViewData![indexPath.row] as! Dictionary<String, Any>
-        print(x)
+//        print(x)
         
        
-        cell.textLabel?.text = x["name"] as? String
+        
         
         let url = URL(string: x["image_url"] as! String)
-        let data = try? Data(contentsOf: url!)
+        
+        
+        let session = URLSession.shared
 
-        if let imageData = data {
-            let image = UIImage(data: imageData)
-            cell.imageView?.image =  image
+        let downloadPicTask = session.dataTask(with: url!) { (data, response, error) in
+            // The download has finished.
+            if let e = error {
+                print("Error downloading cat picture: \(e)")
+            } else {
+                // No errors found.
+                // It would be weird if we didn't have a response, so check for that too.
+                if let res = response as? HTTPURLResponse {
+//                    print("Downloaded cat picture with response code \(res.statusCode)")
+                    if let imageData = data {
+                        // Finally convert that Data into an image and do what you wish with it.
+                        let image = UIImage(data: imageData)
+                        DispatchQueue.main.async {
+                            cell.imageView?.image = image
+                            cell.textLabel?.text = x["name"] as? String
+                            
+                        }
+                        
+                        // Do something with your image.
+                    } else {
+                        print("Couldn't get image: Image is nil")
+                    }
+                } else {
+                    print("Couldn't get response code for some reason")
+                }
+            }
         }
-
-            return cell
+        downloadPicTask.resume()
+        
+        return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        print ("HERHEHERHERHHEHREHHRE")
+        let z = tableViewData![indexPath.row] as! Dictionary<String, Any>
+        let description = "Description: " + (z["description"] as? String)!
+        let mobile = String(describing: z["mobile"] as! NSString)
+        
+        let w = "Contact Info: " + mobile
+        
+        let price = "Price: " + (z["price"] as! String)
+        let message = description + "\n" + price + "\n" + w
+        
+        let alert = UIAlertController(title: z["name"] as! String, message: message, preferredStyle: UIAlertController.Style.alert)
+
+        // add an action (button)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+        
+        alert.addAction(UIAlertAction(title: "Call Seller", style: UIAlertAction.Style.default, handler: { action in
+    
+            UIApplication.shared.openURL(URL(string: "tel://\(mobile)")!)
+
+        }))
+
+        // show the alert
+        self.present(alert, animated: true, completion: nil)
+        
+    }
     
     
     

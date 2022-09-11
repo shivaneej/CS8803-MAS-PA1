@@ -18,7 +18,8 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
     @IBOutlet weak var itemPrice: UITextField!
     @IBOutlet weak var itemImageURL: UITextField!
     @IBOutlet weak var postButton: UIButton!
-    
+    var rep = 0
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,12 +40,15 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
         if sender.text == "" {
             return
         }
-        let urlString = sender.text!
-        let url = URL(string: urlString)!
-        guard let data = try? Data(contentsOf: url) else {
-            return
+        DispatchQueue.global().async {
+            let urlString = sender.text!
+            let url = URL(string: urlString)!
+            guard let data = try? Data(contentsOf: url) else {
+                return
+            }
+            self.image.image = UIImage(data: data)
         }
-        image.image = UIImage(data: data)
+        
     }
 
     
@@ -78,12 +82,17 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
             displayAlert(message: "Please enter item price")
             return
         }
-        
-        createNewPost(title: postTitle, category: postCategory, description: postDesc, contact: postContact, imageURL: postImage, price: postPrice)
+        DispatchQueue.main.async {
+            self.createNewPost(title: postTitle, category: postCategory, description: postDesc, contact: postContact, imageURL: postImage, price: postPrice)
+
+        }
+        print(rep)
+        print("here")
     }
     
     // POST request to create a new post
     func createNewPost(title: String, category: String, description: String, contact: String, imageURL: String, price: String) {
+        
           let parameters: [String: Any] = ["category": category, "description": description, "image_url": imageURL, "mobile": contact, "name": title, "price": price]
           let url = URL(string: "https://mas-prog-asgn.herokuapp.com/posts")!
           
@@ -111,6 +120,7 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
             
             guard let httpResponse = response as? HTTPURLResponse,
                   (200...299).contains(httpResponse.statusCode)
+                    
             else {
               print("Invalid Response received from the server")
               return
@@ -125,7 +135,8 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
               if let jsonResponse = try JSONSerialization.jsonObject(with: responseData, options: .mutableContainers) as? [String: Any] {
                   print(jsonResponse)
                   let message = "Ad Posted!"
-                  
+//                  print(httpResponse.statusCode)
+                  self.rep = httpResponse.statusCode
                   /*
                   DispatchQueue.main.async {
                       if let navController = self.navigationController{
@@ -142,6 +153,7 @@ class SellViewController: UIViewController, UIImagePickerControllerDelegate & UI
             }
           }
           task.resume()
+        
     }
     
     // Display alert with custom message
